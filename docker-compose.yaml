@@ -9,19 +9,20 @@ services:
       - ./conf:/etc/nginx/conf.d
       - ./html:/usr/share/nginx/html
 
-  flask:
-    image: "tolaykinsi/flask:1.0"
-    container_name: flask
-    environment:
-      - FLASK_DEBUG=True
-      - PYTHONUNBUFFERED=True
-    volumes:
-      - ./app:/app
-    ports:
-      - "5000:5000"
-    command: python app.py
-    depends_on:
-      - postgres
+  flask: 
+    # image: "aquaman/flask:1.0" 
+    build: . 
+    container_name: flask 
+    env_file: 
+      - flask.env 
+    ports: 
+      - "5000:5000" 
+    secrets: 
+      - db_password 
+    command: flask --app flask_app run --host=0.0.0.0 
+    depends_on: 
+      postgres: 
+        condition: service_healthy 
 
   postgres:
     image: "postgres:16.4-alpine"
